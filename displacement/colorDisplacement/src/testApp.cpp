@@ -4,7 +4,7 @@
 void testApp::setup(){
     ofSetFrameRate(60);
     ofEnableAlphaBlending();
-    ofBackground(255, 0, 0);
+    ofBackground(0, 0, 0);
     srcImg.loadImage("B.jpg");
     brushImg.loadImage("brush.png");
     
@@ -20,15 +20,17 @@ void testApp::setup(){
     #extension GL_ARB_texture_rectangle : enable\n \
     \
     uniform sampler2DRect tex0;\
-    uniform sampler2DRect maskTex;\
+    uniform sampler2DRect forceTex;\
     \
     void main (void){\
     vec2 pos = gl_TexCoord[0].st;\
     \
+    vec2 force = texture2DRect(forceTex, pos).rg;\
+    pos.s += (force.r - 0.5) * 300.0;\
+    pos.t += (force.g - 0.5) * 300.0;\
     vec3 src = texture2DRect(tex0, pos).rgb;\
-    float mask = texture2DRect(maskTex, pos).r;\
     \
-    gl_FragColor = vec4( src , mask);\
+    gl_FragColor = vec4(src , 1.0);\
     }";
     shader.setupShaderFromSource(GL_FRAGMENT_SHADER, shaderProgram);
     shader.linkProgram();
@@ -47,11 +49,8 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
     
-    // MASK (frame buffer object)
-    //
     forceFbo.begin();
     if (bBrushDown){
-        
         ofPushStyle();
         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
         ofSetColor(ofNoise((float)mouseX / 100.0) * 255.0, ofNoise((float)mouseY / 100.0 + 0.5) * 255.0, 0);
@@ -59,16 +58,15 @@ void testApp::update(){
         ofPopStyle();
     }
     forceFbo.end();
-    
     glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // HERE the shader-masking happends
-    //
+    
+    
     fbo.begin();
     // Cleaning everthing with alpha mask on 0 in order to make it transparent for default
     ofClear(0, 0, 0, 0); 
     
     shader.begin();
-    shader.setUniformTexture("maskTex", forceFbo.getTextureReference(), 1 );
+    shader.setUniformTexture("forceTex", forceFbo.getTextureReference(), 1 );
     
     srcImg.draw(0,0);
 
@@ -79,18 +77,16 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    /*
     ofSetColor(255,255);
     
     
-    //fbo.draw(0,0);
+    fbo.draw(0,0);
     
     ofDrawBitmapString("Drag the Mouse to draw", 15,15);
     ofDrawBitmapString("Press spacebar to clear", 15, 30);
     
     
-    */
-    forceFbo.draw(0, 0);
+    //forceFbo.draw(0, 0);
 }
 
 //--------------------------------------------------------------
