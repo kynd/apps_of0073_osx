@@ -17,6 +17,9 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    
+    void drawSphere();
+    
     ofShader shader;
     ofFbo fbo;
     TextureUtil2D* texture;
