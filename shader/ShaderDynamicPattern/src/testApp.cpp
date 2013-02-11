@@ -263,9 +263,9 @@ void testApp::setup(){
                                           flag = true;
                                       }
                                   }
-                                  float r = float(ind0) / float(numParticles);
-                                  float g = float(ind1) / float(numParticles);
-                                  float b = float(ind2) / float(numParticles);
+                                  float g = float(ind0) / float(numParticles);
+                                  float b = float(ind1) / float(numParticles);
+                                  float r = float(ind2) / float(numParticles);
                                   gl_FragColor = (flag) ? vec4(1.0, 1.0, 0.0, 1.0) : vec4(r, g, b, 1.0);
                               }
                               );
@@ -501,15 +501,15 @@ void testApp::setup(){
                                       posSample.r *= float(width);
                                       posSample.g *= float(height);
                                       float dist = distance(posSample, gl_TexCoord[0].st);
-                                      r += sin((posSample.r - gl_TexCoord[0].s) * 0.001 * float(i)) * 0.03;
+                                      b += sin((posSample.r - gl_TexCoord[0].s) * 0.001 * float(i)) * 0.03;
                                       g += sin((posSample.g - gl_TexCoord[0].t) * 0.001 * float(i)) * 0.03;
-                                      b += sin(r + g) * 0.2;
+                                      r += sin(b + g) * 0.2;
                                       if (dist < 3.0) {
                                           flag = true;
                                       }
                                   }
-                                  r = min(r, b);
-                                  g = min(g, b);
+                                  b = min(r, b);
+                                  g = min(g, r);
                                   gl_FragColor = (flag) ? vec4(1.0, 1.0, 0.0, 1.0) : vec4(r, g, b, 1.0);
                               }
                               );
